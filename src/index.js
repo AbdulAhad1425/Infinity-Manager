@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { Client, Collection, GatewayIntentBits, Events, REST, Routes, SlashCommandBuilder } from 'discord.js';
+import { moderationCommands } from './commands/moderation.js';
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
@@ -16,7 +17,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
-const commands = [
+const baseCommands = [
   {
     data: new SlashCommandBuilder()
       .setName('ping')
@@ -62,7 +63,7 @@ const commands = [
     async execute(interaction) {
       await interaction.reply(
         `🤖 **Infinity Manager**\n` +
-        `Version: 1.0.0\n` +
+        `Version: 1.1.0\n` +
         `Servers: ${client.guilds.cache.size}\n` +
         `Node.js: ${process.version}`
       );
@@ -78,12 +79,21 @@ const commands = [
         '🏓 `/ping` — Check bot latency\n' +
         '📊 `/serverinfo` — Server information\n' +
         '👤 `/userinfo` — User information\n' +
-        '🤖 `/botinfo` — Bot information\n' +
-        '🛠️ More management commands are coming soon.'
+        '🤖 `/botinfo` — Bot information\n\n' +
+        '**🛡️ Moderation**\n' +
+        '🔨 `/ban` — Ban a member\n' +
+        '👢 `/kick` — Kick a member\n' +
+        '⏱️ `/timeout` — Timeout a member\n' +
+        '⚠️ `/warn` — Warn a member\n' +
+        '📋 `/warnings` — View warnings\n' +
+        '🧹 `/clearwarns` — Clear warnings\n' +
+        '🗑️ `/clear` — Delete messages'
       );
     }
   }
 ];
+
+const commands = [...baseCommands, ...moderationCommands];
 
 for (const command of commands) {
   client.commands.set(command.data.name, command);
