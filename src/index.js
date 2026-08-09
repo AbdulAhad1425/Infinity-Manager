@@ -2,7 +2,9 @@ import 'dotenv/config';
 import { Client, Collection, GatewayIntentBits, Events, REST, Routes, SlashCommandBuilder } from 'discord.js';
 import { moderationCommands } from './commands/moderation.js';
 import { securityCommands } from './commands/security.js';
+import { welcomeCommands } from './commands/welcome.js';
 import { registerSecurity } from './security/antiRaid.js';
+import { registerWelcomeSystem } from './config/welcome.js';
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
@@ -42,22 +44,23 @@ const baseCommands = [
   {
     data: new SlashCommandBuilder().setName('botinfo').setDescription('Show Infinity Manager information.'),
     async execute(interaction) {
-      await interaction.reply(`🤖 **Infinity Manager**\nVersion: 1.2.0\nServers: ${client.guilds.cache.size}\nNode.js: ${process.version}`);
+      await interaction.reply(`🤖 **Infinity Manager**\nVersion: 1.3.0\nServers: ${client.guilds.cache.size}\nNode.js: ${process.version}`);
     }
   },
   {
     data: new SlashCommandBuilder().setName('help').setDescription('Show available Infinity Manager commands.'),
     async execute(interaction) {
-      await interaction.reply('**Infinity Manager Commands**\n\n🏓 `/ping`\n📊 `/serverinfo`\n👤 `/userinfo`\n🤖 `/botinfo`\n\n**🛡️ Moderation**\n🔨 `/ban`\n👢 `/kick`\n⏱️ `/timeout`\n⚠️ `/warn`\n📋 `/warnings`\n🧹 `/clearwarns`\n🗑️ `/clear`\n\n**🔒 Security**\n🛡️ `/security status`\n✅ `/security enable`\n⚠️ `/security disable`\n🔒 `/security lockdown`');
+      await interaction.reply('**Infinity Manager Commands**\n\n🏓 `/ping`\n📊 `/serverinfo`\n👤 `/userinfo`\n🤖 `/botinfo`\n\n**🛡️ Moderation**\n🔨 `/ban`\n👢 `/kick`\n⏱️ `/timeout`\n⚠️ `/warn`\n📋 `/warnings`\n🧹 `/clearwarns`\n🗑️ `/clear`\n\n**🔒 Security**\n🛡️ `/security status`\n✅ `/security enable`\n⚠️ `/security disable`\n🔒 `/security lockdown`\n\n**👋 Welcome**\n👋 `/welcome enable|disable|channel|message|status`\n🚪 `/goodbye enable|disable|channel|message|status`\n🎭 `/autorole set|disable|status`');
     }
   }
 ];
 
-const commands = [...baseCommands, ...moderationCommands, ...securityCommands];
+const commands = [...baseCommands, ...moderationCommands, ...securityCommands, ...welcomeCommands];
 
 for (const command of commands) client.commands.set(command.data.name, command);
 
 registerSecurity(client);
+registerWelcomeSystem(client);
 
 client.once(Events.ClientReady, async readyClient => {
   console.log(`✅ ${readyClient.user.tag} is online.`);
