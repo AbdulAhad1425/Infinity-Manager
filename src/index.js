@@ -1,6 +1,16 @@
 import 'dotenv/config';
-import { Client, Collection, GatewayIntentBits, Events, REST, Routes, SlashCommandBuilder } from 'discord.js';
+import {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  Events,
+  REST,
+  Routes,
+  SlashCommandBuilder
+} from 'discord.js';
 import { moderationCommands } from './commands/moderation.js';
+import { automodCommands } from './commands/automod.js';
+import { handleAutomodMessage } from './automod.js';
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
@@ -12,7 +22,11 @@ if (!token || !clientId) {
 }
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
 client.commands = new Collection();
@@ -63,7 +77,7 @@ const baseCommands = [
     async execute(interaction) {
       await interaction.reply(
         `🤖 **Infinity Manager**\n` +
-        `Version: 1.1.0\n` +
+        `Version: 1.2.0\n` +
         `Servers: ${client.guilds.cache.size}\n` +
         `Node.js: ${process.version}`
       );
@@ -87,13 +101,23 @@ const baseCommands = [
         '⚠️ `/warn` — Warn a member\n' +
         '📋 `/warnings` — View warnings\n' +
         '🧹 `/clearwarns` — Clear warnings\n' +
-        '🗑️ `/clear` — Delete messages'
+        '🗑️ `/clear` — Delete messages\n\n' +
+        '**🤖 AutoMod**\n' +
+        '⚙️ `/automod status` — View AutoMod settings\n' +
+        '✅ `/automod enable` — Enable AutoMod\n' +
+        '⛔ `/automod disable` — Disable AutoMod\n' +
+        '🚫 `/automod spam` — Configure spam protection\n' +
+        '🔗 `/automod links` — Configure link blocking\n' +
+        '📨 `/automod invites` — Configure invite blocking\n' +
+        '👥 `/automod mentions` — Set mention limit\n' +
+        '🔤 `/automod word` — Add blocked word\n' +
+        '🧹 `/automod clearwords` — Clear blocked words'
       );
     }
   }
 ];
 
-const commands = [...baseCommands, ...moderationCommands];
+const commands = [...baseCommands, ...moderationCommands, ...automodCommands];
 
 for (const command of commands) {
   client.commands.set(command.data.name, command);
@@ -120,6 +144,10 @@ client.once(Events.ClientReady, async readyClient => {
   } catch (error) {
     console.error('❌ Failed to register slash commands:', error);
   }
+});
+
+client.on(Events.MessageCreate, async message => {
+  await handleAutomodMessage(message);
 });
 
 client.on(Events.InteractionCreate, async interaction => {
