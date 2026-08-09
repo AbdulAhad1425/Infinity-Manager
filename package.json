@@ -1,18 +1,16 @@
 {
   "name": "infinity-manager",
-  "version": "1.0.0",
-  "description": "All-in-one Discord management bot for moderation, automation, security, logging, tickets, roles, and server management.",
+  "version": "2.0.0",
+  "description": "All-in-one Discord management bot for moderation, automation, security, logging, tickets, roles, AI, and server management.",
   "type": "module",
   "main": "src/index.js",
-  "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
-  },
-  "engines": {
-    "node": ">=20"
-  },
+  "scripts": { "start": "node src/index.js", "dev": "node --watch src/index.js", "dashboard": "node dashboard/server.js" },
+  "engines": { "node": ">=20" },
   "dependencies": {
     "discord.js": "^14.21.0",
-    "dotenv": "^17.2.1"
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "openai": "^5.12.0",
+    "pg": "^8.16.3"
   }
 }
